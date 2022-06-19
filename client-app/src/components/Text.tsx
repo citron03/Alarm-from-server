@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SockJs from "sockjs-client";
 
 interface TextProps {}
@@ -11,17 +11,28 @@ const Text: React.FC<TextProps> = () => {
     const sockjs_url = 'http://localhost:8080/echo';
     const sockjs = new SockJs(sockjs_url);
 
-    sockjs.onopen = function () {
-        console.log('소켓 open', sockjs.protocol);
-    };
-    sockjs.onmessage = function (e) {
+
+    useEffect(() => {
+        sockjs.onopen = function () {
+            console.log('소켓 open', sockjs.protocol);
+        };
+    }, []);
+    sockjs.onmessage = (e) => {
         console.log('소켓 message : ', e.data);
         setMessages(prev => [...prev, e.data]);
     };
+    useEffect(() => {
+        console.log(messages);
+        sockjs.onmessage = (e) => {
+            console.log('리렌더링');
+            setMessages(prev => [...prev, e.data]);
+        };
+    });
     sockjs.onclose = function () {
         console.log('소켓 close');
     };
-    
+
+
     return (
         <div>
             <p>받은 알림 목록입니다.</p>
