@@ -2,18 +2,19 @@ const express = require('express');
 const sockjs = require('sockjs');
 const http = require('http');
 
-var sockjs_opts = {sockjs_url: "http://cdn.jsdelivr.net/sockjs/1.0.1/sockjs.min.js"};
+const sockjs_opts = {sockjs_url: "http://cdn.jsdelivr.net/sockjs/1.0.1/sockjs.min.js"};
 
-var sockjs_echo = sockjs.createServer(sockjs_opts);
+const sockjs_echo = sockjs.createServer(sockjs_opts);
 
 sockjs_echo.on('connection', function(conn) {
     conn.on('data', function(message) {
-        conn.write(message);
+      console.log(message, ": 클라이언트에서 온 메세지"); // 클라이언트에서 온 메세지
+      conn.write(`서버가 메세지 ~ ${message} ~ 받았어`); // 클라이언트로 메세지 보내기
     });
 });
 
-var app = express();
-var server = http.createServer(app);
+const app = express();
+const server = http.createServer(app);
 const port = 8080
 
 sockjs_echo.installHandlers(server, {prefix:'/echo'});
